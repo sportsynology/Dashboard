@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แดชบอร์ดยอดขาย</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0715;--card:rgba(255,255,255,.07);--ink:#EFEBFF;--mute:#B2A9D1;--line:rgba(255,255,255,.13);--c1:#A78BFA;--c2:#F472B6;--c3:#60A5FA;--c4:#FBBF24;--c5:#34D399;--up:#4ADE80;--dn:#FB7185;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(900px 600px at 10% -5%,rgba(124,58,237,.40),transparent 60%),radial-gradient(800px 600px at 96% 12%,rgba(192,38,211,.24),transparent 60%),radial-gradient(1000px 700px at 55% 112%,rgba(76,29,149,.50),transparent 60%),#07040f;background-attachment:fixed;color:var(--ink);font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:14px}
+.wrap{max-width:1200px;margin:0 auto;padding:16px 20px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.head h1{font-size:28px;font-weight:700;line-height:1.25;margin:0}
+#sub{font-weight:500}#sub:not(:empty)::before{content:" : ";white-space:pre}
+.sub{color:var(--mute);font-size:13px;margin:2px 0 0}
+select,.bar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.07);color:var(--ink);min-width:150px}
+select option{background:#1a1030;color:#EFEBFF}
+input::placeholder{color:var(--mute)}
+h2{font-size:15px;margin:0 0 12px}
+.h3{font-size:13px;margin:10px 0 6px;color:var(--mute);font-weight:500}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:12px}
+.kpis5{grid-template-columns:repeat(5,minmax(0,1fr));margin-bottom:12px}
+.kpis3{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:12px}
+.two{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:12px}
+@media(max-width:1000px){.kpis,.kpis5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.two,.kpis3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0;backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);box-shadow:0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.09)}
+.kpis5 .kpi .v{font-size:clamp(18px,1.9vw,26px)}
+.kpi .l{color:var(--mute);font-size:13px}
+.kpi .v{font-size:clamp(24px,2.6vw,34px);font-weight:700;margin:6px 0 4px;border-left:5px solid var(--a);padding-left:10px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .d{font-size:12px;color:var(--mute);line-height:1.5}.kpi .d div{white-space:nowrap}
+.up{color:var(--up)!important}.dn{color:var(--dn)!important}.wn{color:var(--c4)!important}.mt{color:var(--mute)!important}
+.scroll{overflow-x:auto}
+.tall{max-height:420px;overflow-y:auto}.tall2{max-height:600px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mute);font-weight:500;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:8px 6px;border-bottom:1px solid var(--line)}
+th.r,td.r{text-align:right;font-variant-numeric:tabular-nums}
+.tall th,.tall2 th{position:sticky;top:0;z-index:2;background:#1b1233;box-shadow:0 1px 0 var(--line)}
+tr:last-child td{border-bottom:0}.empty{color:var(--mute);text-align:center;padding:12px}
+svg{width:100%;height:auto;display:block}
+.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;margin-top:8px;color:var(--mute)}.lg i,.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px}
+#msg{display:none;background:var(--card);border:1px solid var(--dn);color:var(--dn);padding:10px 12px;border-radius:8px;margin-bottom:12px}
+[hidden]{display:none!important}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.bar label,.hsel label{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:13px}
+.bar input{flex:1;min-width:200px}
+.hsel{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mb{height:6px;border-radius:3px;background:rgba(255,255,255,.09);margin-top:5px}.mb span{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+.n2{display:block;color:var(--mute);font-size:12px}
+/* verdict + alerts */
+.verdict{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.05);border-left:6px solid var(--mute);margin-bottom:12px}
+.verdict.hi{border-color:var(--up)}.verdict.lo{border-color:var(--dn)}.verdict.md{border-color:var(--c4)}
+.verdict p{margin:0;font-size:17px;font-weight:500;line-height:1.6}
+.badge{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;display:inline-block}
+.badge.hi{color:var(--up);border-color:var(--up)}.badge.lo{color:var(--dn);border-color:var(--dn)}.badge.md{color:var(--c4);border-color:var(--c4)}.badge.mt{border-color:var(--line)}
+.alerts{display:grid;gap:8px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.05);border-left:5px solid var(--mute);line-height:1.55}
+.alert.s2{border-color:var(--dn);background:rgba(251,113,133,.10)}.alert.s1{border-color:var(--c4);background:rgba(251,191,36,.08)}.alert.s0{border-color:var(--c3)}
+.alert .t{flex:1}.alert a{color:var(--c1);text-decoration:underline;cursor:pointer;white-space:nowrap}
+.note{color:var(--mute);font-size:12.5px;margin:8px 0 0;line-height:1.6}
+/* sidebar */
+.app{display:flex;min-height:100vh}
+.side{width:236px;flex:none;background:rgba(18,10,36,.55);backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:18px 12px;z-index:40}
+.brand{font-weight:700;font-size:16px;padding:4px 10px 16px;background:linear-gradient(90deg,#C4B5FD,#F0ABFC);-webkit-background-clip:text;background-clip:text;color:transparent}
+.side nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.side nav button{font:inherit;font-size:14.5px;text-align:left;border:0;background:none;color:var(--mute);padding:12px 12px;border-radius:8px;cursor:pointer;border-left:3px solid transparent}
+.side nav button:hover{background:rgba(255,255,255,.07)}
+.side nav button.on{background:rgba(167,139,250,.20);color:#fff;font-weight:700;border-left-color:#C4B5FD}
+.sidefoot{padding-top:12px}.sidefoot .lo{width:100%}
+.main{flex:1;min-width:0}
+.hdl{display:flex;align-items:center;gap:12px}
+.menu-btn{display:none;font:inherit;font-size:20px;line-height:1;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);border-radius:8px;padding:8px 11px;cursor:pointer}
+.bd{display:none}
+@media(max-width:900px){.side{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .2s;width:260px}.side.open{transform:none;box-shadow:0 0 24px rgba(0,0,0,.25)}.bd.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30}.menu-btn{display:inline-flex}.wrap{padding:12px}.head h1{font-size:20px}}
+/* lock */
+#lock{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;background:radial-gradient(900px 600px at 10% -5%,rgba(124,58,237,.40),transparent 60%),radial-gradient(900px 700px at 90% 110%,rgba(192,38,211,.28),transparent 60%),#07040f}
+.lockbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px;text-align:center;width:100%;max-width:340px}
+.lockbox h1{font-size:18px;margin:6px 0 2px}.lockico{font-size:30px}
+.pin{display:flex;gap:10px;justify-content:center;margin:18px 0 8px}
+.pin input{width:52px;height:60px;text-align:center;font:inherit;font-size:24px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.07);color:var(--ink);padding:0}
+.pin input:focus{outline:2px solid var(--c1);border-color:transparent}
+.pin.shake{animation:shk .35s}@keyframes shk{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.lockmsg{color:var(--dn);min-height:20px;margin:4px 0 10px;font-size:13px}
+.rem{display:inline-flex;align-items:center;gap:6px;color:var(--mute);font-size:13px;cursor:pointer}
+.lo{font:inherit;font-size:13px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--mute);border-radius:8px;padding:8px 12px;cursor:pointer}
+body.locked .app{display:none}
+*{scrollbar-color:#5b4a9c transparent}
+</style>
+</head>
+<body>
+<div id="lock" hidden>
+ <div class="lockbox">
+  <div class="lockico">🔒</div>
+  <h1>แดชบอร์ดยอดขาย</h1>
+  <p class="sub">กรอกรหัส 4 หลักเพื่อเข้าดูข้อมูล</p>
+  <div class="pin" id="pin">
+   <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="รหัสหลักที่ 1">
+   <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="รหัสหลักที่ 2">
+   <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="รหัสหลักที่ 3">
+   <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="off" aria-label="รหัสหลักที่ 4">
+  </div>
+  <p class="lockmsg" id="lockmsg"></p>
+  <label class="rem"><input type="checkbox" id="rem"> จำเครื่องนี้</label>
+ </div>
+</div>
+<div class="app">
+ <aside class="side" id="side">
+  <div class="brand">แดชบอร์ดยอดขาย</div>
+  <nav id="tabs">
+   <button data-t="ov" class="on">ภาพรวมผู้บริหาร</button>
+   <button data-t="prod">ยอดขายและสินค้า</button>
+   <button data-t="ch">ช่องทางและทีมขาย</button>
+   <button data-t="risk">รายงานความเสี่ยง</button>
+  </nav>
+  <div class="sidefoot"><button id="logout" class="lo" hidden>ออกจากระบบ</button></div>
+ </aside>
+ <div class="bd" id="bd"></div>
+ <div class="main">
+<div class="wrap">
+ <div class="head">
+  <div class="hdl"><button id="menuBtn" class="menu-btn" aria-label="เมนู">☰</button><h1><span id="pgtitle">ภาพรวมผู้บริหาร</span><span id="sub">กำลังโหลดข้อมูล…</span></h1></div>
+  <div class="hsel"><label id="monthWrap">เดือน <select id="month" aria-label="เลือกเดือน"></select></label></div>
+ </div>
+ <div id="msg"></div>
+
+ <!-- 1) ภาพรวมผู้บริหาร -->
+ <section id="v-ov">
+  <div id="ov-verdict"></div>
+  <div class="grid kpis" id="ov-kpi"></div>
+  <div class="card" style="margin-bottom:12px"><h2>ยอดขายตามเลข SO เทียบ รายรับ (ยอดสุทธิตามวันที่ซื้อ) รายเดือน</h2><div id="ov-chart"></div><p class="note" id="ov-gap"></p></div>
+  <div class="card"><h2>จุดที่ต้องดู (เฉพาะที่ผิดปกติ)</h2><div class="alerts" id="ov-alerts"></div></div>
+ </section>
+
+ <!-- 2) ยอดขายและสินค้า -->
+ <section id="v-prod" hidden>
+  <div class="bar">
+   <label>มุมมอง <select id="dim"><option value="grp">กลุ่มสินค้า</option><option value="cat">หมวดสินค้า</option><option value="typ">ประเภทสินค้า</option></select></label>
+   <label>เลือก <select id="dv"></select></label>
+   <input id="q" placeholder="🔍 ค้นหารุ่นสินค้า (เว้นว่าง = ทุกรุ่น)" autocomplete="off">
+  </div>
+  <div class="grid kpis3" id="p-kpi"></div>
+  <div class="grid two">
+   <div class="card"><h2 id="p-dt"></h2><div class="scroll tall"><table id="p-dtab"></table></div></div>
+   <div class="card"><h2>แนวโน้มยอดสุทธิรายเดือน</h2><div id="p-trend"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px"><h2>Top 10 สินค้า Hero (กฎ 80/20)</h2><p class="sub" id="p-hn"></p><div class="scroll"><table id="p-hero"></table></div></div>
+  <div class="grid two">
+   <div class="card"><h2>ยอดพุ่งสูงสุด (เทียบเดือนก่อน)</h2><div class="scroll"><table id="p-up"></table></div></div>
+   <div class="card"><h2>ยอดตกหนักสุด (เทียบเดือนก่อน)</h2><div class="scroll"><table id="p-dn"></table></div></div>
+  </div>
+  <p class="note" id="p-note"></p>
+ </section>
+
+ <!-- 3) ช่องทางและทีมขาย -->
+ <section id="v-ch" hidden>
+  <div class="grid two">
+   <div class="card"><h2 id="c-pt"></h2><div id="c-pie"></div></div>
+   <div class="card"><h2>ช่องทางขาย: ยอด SO เทียบเดือนก่อน</h2><div class="scroll tall"><table id="c-tab"></table></div></div>
+  </div>
+  <div class="grid two">
+   <div class="card"><h2 id="c-ft"></h2><div id="c-func"></div></div>
+   <div class="card"><h2>Lead เข้ามา เทียบ ปิดได้ (6 เดือนล่าสุด)</h2><div id="c-pipe"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+   <div class="bar" style="margin-bottom:6px"><h2 style="margin:0;flex:1">อัตราปิดการขายรายบุคคล</h2><label>ช่วง <select id="tw"><option value="m">เดือนที่เลือก</option><option value="3">3 เดือนล่าสุด</option></select></label></div>
+   <p class="sub" id="c-tn"></p><div class="scroll tall"><table id="c-team"></table></div></div>
+  <div class="card"><h2>อัตราปิดการขายตามช่องทางที่ลูกค้าติดต่อเข้ามา</h2><div class="scroll"><table id="c-via"></table></div></div>
+ </section>
+
+ <!-- 4) ความเสี่ยง -->
+ <section id="v-risk" hidden>
+  <div class="grid kpis5" id="r-kpi"></div>
+  <div class="card" style="margin-bottom:12px">
+   <div class="bar" style="margin-bottom:6px"><h2 style="margin:0;flex:1">ยอดคงค้าง เรียงจากมากไปน้อย</h2><label>แสดง <select id="r-st"><option value="all">ทุกราย</option><option value="2">เฉพาะวิกฤต (&gt;60 วัน)</option><option value="1">เตือนขึ้นไป (&gt;30 วัน)</option></select></label></div>
+   <p class="sub">อายุหนี้นับจากวันที่ซื้อที่เก่าที่สุดของลูกค้ารายนั้น ถึงวันที่ข้อมูลล่าสุด (ข้อมูลไม่มีวันครบกำหนด จึงใช้อายุหนี้แทน)</p>
+   <div class="scroll tall2"><table id="r-debt"></table></div></div>
+  <div class="card">
+   <div class="bar" style="margin-bottom:6px"><h2 style="margin:0;flex:1">สินค้าไม่หมุนเวียน เรียงจากเงียบนานที่สุด</h2>
+    <label><select id="r-dim"><option value="grp">กลุ่มสินค้า</option><option value="cat">หมวดสินค้า</option><option value="typ">ประเภทสินค้า</option></select></label><label><select id="r-dv"></select></label></div>
+   <p class="sub">รุ่นที่เคยขายได้ แต่ไม่มียอดเกิน 30 วัน (ไม่รวมรุ่นที่ขายครั้งเดียวและพรีออเดอร์) · ไม่มีข้อมูลสต็อก จึงบอกได้เพียงว่าขายไม่ออก ไม่ใช่ค้างสต็อก</p>
+   <div class="scroll tall2"><table id="r-dead"></table></div></div>
+ </section>
+</div>
+ </div>
+</div>
+
+<script>
+/* ===== ตั้งค่า ===== */
+const CFG = {
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwQp18kWTL5hlJQFzoFznMylmPP2jpuhscmnilyU4F2GTQ-76T9syKtpSg21tCAVRzC/exec',
+  PIN: '1234',                    // รหัสเข้าหน้าเว็บ 4 หลัก — เป็นแค่การล็อกหน้าเว็บ ไม่ใช่ระบบรักษาความปลอดภัยของข้อมูล
+  B2B_CHANNEL: 'line b2b',
+  EXCLUDE_CANCELLED: true,
+  AR_WARN_DAYS: 30,               // ยอดค้างเกินกี่วัน = เตือน
+  AR_CRIT_DAYS: 60,               // ยอดค้างเกินกี่วัน = วิกฤต
+  COL: { date:'วันที่ซื้อ', order:'เลขที่คำสั่งซื้อ', prod:'รุ่น', qty:'จำนวนขาย', pre:'พรีออเดอร์',
+         cust:'ชื่อลูกค้า', cancel:'ยกเลิกใน shopee', ch:'ช่องทาง', price:'ราคา', net:'ยอดสุทธิ', ar:'ยอดคงค้าง', prov:'จังหวัด', pay:'ช่องทางการชำระ', ship:'ช่องทางจัดส่งสินค้า', ctype:'ประเภทการติดต่อ' }
+};
+/* ================== */
+
+const provN = v => /^(กทม\.?|กรุงเทพ(ฯ|มหานคร)?)$/.test(v) ? 'กรุงเทพฯ' : v;
+let ROWS = [], LEADS = [], OFFS = [], CHAT = { shopee: [], fb: [] }, TGT = [], DBRNG = {}, LDRNG = {}, SORNG = {}, MON = '', CUR = 'ov', SKUM = 0;
+let SOBY = new Map(), RCBY = new Map();
+const CATS = [ { k:'cat', tab:'หมวดสินค้า', col:'หมวดสินค้า' }, { k:'typ', tab:'ประเภทสินค้า', col:'ประเภทสินค้า' }, { k:'grp', tab:'กลุ่มสินค้า', col:'กลุ่มสินค้า' } ];
+const TABS = ['ov', 'prod', 'ch', 'risk'];
+const TITLES = { ov: 'ภาพรวมผู้บริหาร', prod: 'ยอดขายและสินค้า', ch: 'ช่องทางและทีมขาย', risk: 'รายงานความเสี่ยง' };
+const DIMN = { grp: 'กลุ่มสินค้า', cat: 'หมวดสินค้า', typ: 'ประเภทสินค้า' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = v => Number(String(v ?? '').replace(/[,฿\s]/g, '')) || 0;
+const norm = s => String(s ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
+const fmt = n => Math.round(n).toLocaleString('th-TH');
+const money = v => v >= 1e6 ? '฿' + (v/1e6).toFixed(2) + ' ล้าน' : '฿' + fmt(v);
+const moneyS = v => v >= 1e6 ? '฿' + (v / 1e6).toFixed(2) + 'M' : '฿' + fmt(v);
+const short = v => v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : v >= 1e3 ? (+(v/1e3).toFixed(1)) + 'k' : String(Math.round(v));
+const monthName = k => new Date(+k.slice(0,4), +k.slice(5,7)-1, 1).toLocaleDateString('th-TH', { month:'long', year:'numeric' });
+const mShort = k => new Date(+k.slice(0,4), +k.slice(5,7)-1, 1).toLocaleDateString('th-TH', { month:'short', year:'2-digit' });
+const dateTh = d => new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+const marked = v => { const s = norm(v); return s !== '' && !['-','no','false','0','ไม่','n'].includes(s); };
+const sg = v => (v >= 0 ? '+' : '−') + moneyS(Math.abs(v));
+const skuKey = s => String(s).replace(/\s+/g, '').toLowerCase();
+
+function parseDate(v) {
+  const s = String(v ?? '').trim(); let y, m, d, a;
+  if ((a = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) { y = +a[1]; m = +a[2]; d = +a[3]; }
+  else if ((a = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/))) { d = +a[1]; m = +a[2]; y = +a[3]; if (y < 100) y += 2000; if (m > 12 && d <= 12) [d, m] = [m, d]; }
+  else return '';
+  if (y > 2400) y -= 543;
+  return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+function leadDate(raw, dayNo) {   // วันที่ใน Lead: บางแถววัน/เดือนสลับ ใช้ "วันที่ (เลขวัน)" ยืนยัน
+  const s = String(raw ?? '').trim(), dn = Number(dayNo); let y, m, d, a;
+  if ((a = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) { y = +a[1]; m = +a[2]; d = +a[3]; if (dn && dn !== d && dn === m) [m, d] = [d, m]; }
+  else if ((a = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/))) { m = +a[1]; d = +a[2]; y = +a[3]; if (dn && dn !== d && dn === m) [m, d] = [d, m]; else if (m > 12) [m, d] = [d, m]; }
+  else return '';
+  if (y < 100) y += 2000; if (y > 2400) y -= 543;
+  return y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+}
+const starOf = v => {
+  if (typeof v === 'number') return v >= 1 && v <= 5 ? Math.round(v) : 0;
+  const t = String(v ?? '').trim(); if (!t) return 0;
+  const n = parseFloat(t.replace(/[^\d.]/g, '')); if (n >= 1 && n <= 5) return Math.round(n);
+  const st = (t.match(/[★⭐]/g) || []).length; return st >= 1 && st <= 5 ? st : 0;
+};
+const splitOff = v => { const a = String(v ?? '').split(/\s*[+&,\-–]\s*/).map(x => x.trim()).filter(Boolean); return a.length ? a : ['ไม่ระบุ']; };
+
+function group(rows, keyFn, init, add) {
+  const g = new Map();
+  rows.forEach(r => { const k = keyFn(r); if (!g.has(k)) g.set(k, init()); add(g.get(k), r); });
+  return g;
+}
+const nOrd = rs => new Set(rs.map(r => r.order)).size;
+const net = rs => rs.reduce((a, r) => a + r.net, 0);
+const sum = a => a.reduce((x, y) => x + y, 0);
+const rangeOf = ds => { let mn = '', mx = ''; ds.forEach(d => { if (!d) return; if (!mn || d < mn) mn = d; if (d > mx) mx = d; }); return { min: mn, max: mx }; };
+const dayN = d => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 864e5;
+const mDim = mk => new Date(+mk.slice(0,4), +mk.slice(5,7), 0).getDate();
+const mPrev = m => { const k = +m.slice(0,4) * 12 + (+m.slice(5,7) - 2); return Math.floor(k / 12) + '-' + String(k % 12 + 1).padStart(2, '0'); };
+const mYoY = m => (+m.slice(0,4) - 1) + m.slice(4);
+function monthDone(mk, rng) {   // เดือนนี้มีข้อมูลครบทั้งเดือนหรือไม่
+  if (!rng || !rng.min) return false;
+  const minM = rng.min.slice(0,7), maxM = rng.max.slice(0,7);
+  if (mk < minM || mk > maxM) return false;
+  if (mk === minM && +rng.min.slice(8,10) > 3) return false;
+  if (mk === maxM && +rng.max.slice(8,10) < mDim(mk) - 2) return false;
+  return true;
+}
+const pctH = (cur, prev) => { if (!prev) return ''; const p = (cur - prev) / prev * 100, a = Math.abs(p);
+  return `<span class="${p >= 0 ? 'up' : 'dn'}">${p >= 0 ? '▲' : '▼'}&#8202;${a >= 100 ? a.toFixed(0) : a.toFixed(1)}%</span>`; };
+function cmpM(mk, valOf, rng, delta = pctH) {
+  if (!monthDone(mk, rng)) return { note: 'ข้อมูลไม่ครบเดือน', mom: '', yoy: '' };
+  const cur = valOf(mk), one = ref => monthDone(ref, rng) ? valOf(ref) : null, p = one(mPrev(mk)), y = one(mYoY(mk));
+  return { note: '', mom: p == null ? '' : delta(cur, p), yoy: y == null ? '' : delta(cur, y) };
+}
+const cmpHtml = x => x.note ? `<div style="color:var(--mute)">${x.note}</div>` : `<div>MoM ${x.mom || '-'}</div>` + (x.yoy ? `<div>YoY ${x.yoy}</div>` : '');
+const ptH = (cur, ref) => ref == null || cur == null ? '' : `<span class="${cur - ref >= 0 ? 'up' : 'dn'}">${cur - ref >= 0 ? '▲' : '▼'}&#8202;${Math.abs(cur - ref).toFixed(1)} จุด</span>`;
+
+/* ---- ตาราง: cells เป็น HTML (ผู้เรียก esc ข้อความเอง) ---- */
+const tbl = (heads, rows, from = 1) => '<tr>' + heads.map((h, i) => `<th class="${i >= from ? 'r' : ''}">${h}</th>`).join('') + '</tr>' +
+  (rows.length ? rows.map(r => '<tr>' + r.map((c, i) => `<td class="${i >= from ? 'r' : ''}">${c}</td>`).join('') + '</tr>').join('')
+               : `<tr><td class="empty" colspan="${heads.length}">ไม่มีข้อมูล</td></tr>`);
+const kc = (l, v, d, col) => `<div class="card kpi" style="--a:var(${col || '--c1'})"><div class="l">${l}</div><div class="v">${v}</div><div class="d">${d || ''}</div></div>`;
+const sgC = d => `<span class="${d >= 0 ? 'up' : 'dn'}">${sg(d)}</span>`;
+
+/* ---- กราฟ ---- */
+function lines2(id, series, fa, fl, o = {}) {
+  const all = series.flatMap(s => s.pts.filter(q => q.v !== null));
+  if (!all.length) { $(id).innerHTML = '<p class="empty">ไม่มีข้อมูล</p>'; return; }
+  const W = Math.max(300, $(id).clientWidth || 640), H = W < 500 ? 230 : 300, p = { l:48, r:14, t:24, b:28 };
+  const pw = Math.pow(10, Math.floor(Math.log10(Math.max(...all.map(q => q.v), 1)))), mx = Math.ceil(Math.max(...all.map(q => q.v), 1) / pw) * pw;
+  const n = series[0].pts.length, x = i => p.l + (i + .5) * (W - p.l - p.r) / n, y = v => H - p.b - v / mx * (H - p.t - p.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let g = 0; g <= 4; g++) s += `<line x1="${p.l}" x2="${W-p.r}" y1="${y(mx/4*g)}" y2="${y(mx/4*g)}" stroke="var(--line)"/><text x="${p.l-6}" y="${y(mx/4*g)+4}" text-anchor="end" font-size="11" fill="var(--mute)">${short(mx/4*g)}</text>`;
+  series[0].pts.forEach((q, i) => s += `<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--mute)">${(i % (o.step || 1)) ? '' : esc((W - p.l - p.r) / n < 44 && !o.step ? q.label.split(' ')[0] : q.label)}</text>`);
+  series.forEach(sr => { let d = '', pen = false;
+    sr.pts.forEach((q, i) => { if (q.v === null) { pen = false; return; } d += (pen ? 'L' : 'M') + x(i) + ' ' + y(q.v) + ' '; pen = true; });
+    s += `<path d="${d}" fill="none" stroke="var(${sr.color})" stroke-width="2.5" stroke-linejoin="round"/>`; });
+  series.forEach((sr, si) => sr.pts.forEach((q, i) => { if (q.v === null) return;
+    s += `<circle cx="${x(i)}" cy="${y(q.v)}" r="${o.r || 4}" fill="var(${sr.color})"/>${o.nov ? '' : `<text x="${x(i)}" y="${y(q.v) + (series.length > 1 && series.some(z => z.pts[i].v !== null && z.pts[i].v > q.v) ? 17 : -9)}" text-anchor="middle" font-size="10.5" fill="var(${sr.color})">${fl(q.v)}</text>`}`; }));
+  $(id).innerHTML = s + '</svg>' + (series.length > 1 || series[0].name ? '<div class="lg">' + series.map(sr => `<span><i class="sw" style="background:var(${sr.color})"></i>${esc(sr.name)}</span>`).join('') + '</div>' : '');
+}
+function gbars(id, cats, series, fl) {
+  const all = series.flatMap(sr => sr.vals.filter(v => v !== null && v !== undefined));
+  if (!all.length) { $(id).innerHTML = '<p class="empty">ไม่มีข้อมูล</p>'; return; }
+  const W = Math.max(300, $(id).clientWidth || 640), H = W < 500 ? 230 : 300, p = { l:44, r:10, t:22, b:28 };
+  const pw = Math.pow(10, Math.floor(Math.log10(Math.max(...all, 1)))), mx = Math.ceil(Math.max(...all, 1) / pw) * pw;
+  const n = cats.length, gw = (W - p.l - p.r) / n, bw = gw * .8 / series.length, y = v => H - p.b - v / mx * (H - p.t - p.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let g = 0; g <= 4; g++) s += `<line x1="${p.l}" x2="${W-p.r}" y1="${y(mx/4*g)}" y2="${y(mx/4*g)}" stroke="var(--line)"/><text x="${p.l-6}" y="${y(mx/4*g)+4}" text-anchor="end" font-size="11" fill="var(--mute)">${short(mx/4*g)}</text>`;
+  cats.forEach((c, i) => s += `<text x="${p.l + (i + .5) * gw}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--mute)">${esc(gw < 44 ? c.split(' ')[0] : c)}</text>`);
+  series.forEach((sr, si) => sr.vals.forEach((v, i) => { if (v === null || v === undefined) return;
+    const bx = p.l + i * gw + gw * .1 + si * bw;
+    s += `<rect x="${bx}" y="${y(v)}" width="${Math.max(bw - 1, 1)}" height="${H - p.b - y(v)}" rx="2" fill="var(${sr.color})"/>`;
+    if (bw >= 26) s += `<text x="${bx + bw/2}" y="${y(v) - 4}" text-anchor="middle" font-size="9.5" fill="var(--ink)">${fl(v)}</text>`; }));
+  $(id).innerHTML = s + '</svg><div class="lg">' + series.map(sr => `<span><i class="sw" style="background:var(${sr.color})"></i>${esc(sr.name)}</span>`).join('') + '</div>';
+}
+function hbar(id, items, fv) {
+  if (!items.length) { $(id).innerHTML = '<p class="empty">ไม่มีข้อมูล</p>'; return; }
+  const W = Math.max(300, $(id).clientWidth || 320), lw = Math.min(120, W * .3), rh = 28;
+  const room = Math.max(40, W - lw - (W < 500 ? 150 : 170)), top = Math.max(...items.map(c => c[1]), 1);
+  let b = `<svg viewBox="0 0 ${W} ${items.length * rh + 4}" role="img">`;
+  items.forEach((c, i) => { const y = 2 + i * rh, w = Math.max(c[1] / top * room, 2);
+    b += `<text x="0" y="${y+17}" font-size="12.5" fill="var(--ink)">${esc(c[0])}</text><rect x="${lw}" y="${y+5}" width="${w}" height="14" rx="3" fill="var(--c1)"/><text x="${lw+w+6}" y="${y+17}" font-size="12" fill="var(--mute)">${fv(c[1])}${c[2] ? ' · ' + esc(c[2]) : ''}</text>`; });
+  $(id).innerHTML = b + '</svg>';
+}
+function pie(id, items, center, csub, fv) {   // โดนัท items = [[ชื่อ, ค่า], ...]
+  const tot = items.reduce((a, x) => a + x[1], 0);
+  if (!tot) { $(id).innerHTML = '<p class="empty">ไม่มีข้อมูล</p>'; return; }
+  const pal = ['--c1', '--c2', '--c3', '--c4', '--c5', '--mute'], R = 88, r = 52, S = 200, cx = S / 2, cy = S / 2, col = i => `var(${pal[Math.min(i, pal.length - 1)]})`;
+  const pt = (rad, a) => [cx + rad * Math.sin(a), cy - rad * Math.cos(a)];
+  let a0 = 0, svg = `<svg viewBox="0 0 ${S} ${S}" style="width:200px;height:200px;flex:none" role="img">`;
+  items.forEach((it, i) => {
+    const frac = it[1] / tot, a1 = a0 + frac * 2 * Math.PI;
+    if (frac >= .9999) svg += `<circle cx="${cx}" cy="${cy}" r="${(R + r) / 2}" fill="none" stroke="${col(i)}" stroke-width="${R - r}"/>`;
+    else if (frac > 0) {
+      const [x0, y0] = pt(R, a0), [x1, y1] = pt(R, a1), [x2, y2] = pt(r, a1), [x3, y3] = pt(r, a0), lg = frac > .5 ? 1 : 0;
+      svg += `<path d="M${x0} ${y0} A${R} ${R} 0 ${lg} 1 ${x1} ${y1} L${x2} ${y2} A${r} ${r} 0 ${lg} 0 ${x3} ${y3} Z" fill="${col(i)}" stroke="rgba(8,4,20,.6)" stroke-width="1.5"><title>${esc(it[0])}: ${fv(it[1])} (${(frac * 100).toFixed(1)}%)</title></path>`;
+      if (frac >= .06) { const [tx, ty] = pt((R + r) / 2, (a0 + a1) / 2); svg += `<text x="${tx}" y="${ty + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" stroke="rgba(0,0,0,.35)" stroke-width="2" paint-order="stroke">${(frac * 100).toFixed(0)}%</text>`; }
+    }
+    a0 = a1;
+  });
+  svg += `<text x="${cx}" y="${cy - 2}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)">${center}</text><text x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="11" fill="var(--mute)">${esc(csub)}</text></svg>`;
+  $(id).innerHTML = `<div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap">${svg}<div style="font-size:13px;display:grid;gap:6px">` +
+    items.map((it, i) => `<div><i style="display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;background:${col(i)}"></i>${esc(it[0])} <b>${(it[1] / tot * 100).toFixed(1)}%</b> <span style="color:var(--mute)">(${fv(it[1])})</span></div>`).join('') + '</div></div>';
+}
+
+/* ---- ดัชนีข้อมูลรายเดือน ---- */
+const soOf = k => SOBY.get(k) || [], rcOf = k => RCBY.get(k) || [], ldOf = k => LEADS.filter(r => r.date.startsWith(k));
+function buildIdx() {
+  SOBY = group(ROWS.filter(r => r.sod), r => r.sod.slice(0, 7), () => [], (a, r) => a.push(r));
+  RCBY = group(ROWS.filter(r => r.date), r => r.date.slice(0, 7), () => [], (a, r) => a.push(r));
+}
+let TGTM = null;
+function tgtOf(m, ch) {   // ch = null → เป้ารวม
+  const ms = TGT.filter(t => t.m === m); if (!ms.length) return null;
+  if (ch == null) { const a = ms.find(t => !t.ch || ['รวม', 'ทั้งหมด', 'total', 'all'].includes(t.ch)); return a ? a.v : ms.reduce((x, t) => x + t.v, 0); }
+  const c = ms.find(t => t.ch === norm(ch)); return c ? c.v : null;
+}
+function tgtMonth(v) {
+  const s = String(v ?? '').trim(); if (!s) return '';
+  let a, y;
+  if ((a = s.match(/^(\d{4})[-\/](\d{1,2})$/))) { y = +a[1]; if (y > 2400) y -= 543; return y + '-' + a[2].padStart(2, '0'); }
+  if ((a = s.match(/^(\d{1,2})[-\/](\d{4})$/))) { y = +a[2]; if (y > 2400) y -= 543; return y + '-' + a[1].padStart(2, '0'); }
+  const TM = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'], TS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  let mi = TM.findIndex(x => s.includes(x)); if (mi < 0) mi = TS.findIndex(x => s.includes(x));
+  if (mi >= 0 && (a = s.match(/(\d{4}|\d{2})\s*$/))) { y = +a[1]; if (y < 100) y += 2500; if (y > 2400) y -= 543; return y + '-' + String(mi + 1).padStart(2, '0'); }
+  const d = parseDate(s); return d ? d.slice(0, 7) : '';
+}
+
+/* ---- ยอดคงค้าง (พร้อมอายุหนี้) / สินค้าไม่หมุนเวียน ---- */
+function debtInfo() {
+  const ref = DBRNG.max, rs = ROWS.filter(r => r.ar > 0), real = r => /^\(ว่าง\)/.test(r.order) ? '' : r.order;
+  const ageOf = r => r.date && ref ? Math.max(0, dayN(ref) - dayN(r.date)) : 0;
+  const list = [...group(rs, r => r.cust || 'ไม่ระบุ', () => ({ v: 0, rs: [] }), (a, r) => { a.v += r.ar; a.rs.push(r); })].map(([k, a]) => {
+    const age = Math.max(...a.rs.map(ageOf)), ds = a.rs.map(r => r.date).filter(Boolean).sort();
+    return { k, v: a.v, o: nOrd(a.rs), age, oldest: ds[0] || '', so: [...new Set(a.rs.map(real).filter(Boolean))].join(', ') || '-',
+      st: age > CFG.AR_CRIT_DAYS ? 2 : age > CFG.AR_WARN_DAYS ? 1 : 0 };
+  }).sort((a, b) => b.v - a.v);
+  const tot = sum(list.map(x => x.v)), crit = list.filter(x => x.st === 2), warn = list.filter(x => x.st === 1);
+  return { list, tot, crit, warn, critV: sum(crit.map(x => x.v)), warnV: sum(warn.map(x => x.v)), n: nOrd(rs) };
+}
+function calcDead(refD) {
+  const g = group(ROWS.filter(r => r.date && r.date <= refD && r.prod && r.qty > 0), r => r.prod, () => ({ last: '', lr: null, q: 0, v: 0, rs: [], pre: false }),
+    (a, r) => { if (r.date > a.last) { a.last = r.date; a.lr = r; } a.q += r.qty; a.v += r.net; a.rs.push(r); if (r.pre) a.pre = true; });
+  return [...g].map(([k, a]) => ({ k, last: a.last, idle: dayN(refD) - dayN(a.last), q: a.q, v: a.v, o: nOrd(a.rs), pre: a.pre,
+    cat: a.lr.cat || '(ไม่ระบุ)', typ: a.lr.typ || '(ไม่ระบุ)', grp: a.lr.grp || '(ไม่ระบุ)' }))
+    .filter(x => !x.pre && x.o > 1).sort((a, b) => b.idle - a.idle || b.v - a.v);
+}
+const stBadge = st => st === 2 ? '<span class="badge lo">วิกฤต</span>' : st === 1 ? '<span class="badge md">เตือน</span>' : '<span class="badge hi">ปกติ</span>';
+
+/* ===== 1) ภาพรวมผู้บริหาร ===== */
+function chStats(m) {
+  const g = group(soOf(m), r => r.ch || 'ไม่ระบุ', () => [], (a, r) => a.push(r));
+  return new Map([...g].map(([k, rs]) => [k, { o: nOrd(rs), v: net(rs) }]));
+}
+function renderOv() {
+  const m = MON;
+  if (!m) { $('ov-verdict').innerHTML = ''; $('ov-kpi').innerHTML = ''; $('ov-chart').innerHTML = '<p class="empty">ไม่มีข้อมูล</p>'; $('ov-alerts').innerHTML = ''; $('ov-gap').textContent = ''; return; }
+  $('sub').textContent = monthName(m);
+  const P = mPrev(m), cur = net(soOf(m)), prv = net(soOf(P)), okP = prv > 0 && monthDone(P, SORNG), okM = monthDone(m, SORNG);
+  const rc = net(rcOf(m)), tgt = tgtOf(m, null);
+  const L = ldOf(m), LP = ldOf(P), lr = L.length ? L.filter(r => r.bought).length / L.length * 100 : null;
+  const lpr = LP.length && monthDone(P, LDRNG) ? LP.filter(r => r.bought).length / LP.length * 100 : null;
+  const D = debtInfo(), mom = okP ? (cur - prv) / prv * 100 : null;
+
+  // KPI 4 ใบ (สีเขียว = ดี / แดง = ต้องระวัง)
+  const k1 = kc('ยอดขาย SO', money(cur), cmpHtml(cmpM(m, k => net(soOf(k)), SORNG)), okP ? (cur >= prv ? '--up' : '--dn') : '--c1');
+  const tp = tgt ? cur / tgt * 100 : null;
+  const k2 = tgt ? kc('ยอดเทียบเป้า', tp.toFixed(0) + '%', `เป้า ${moneyS(tgt)} · ${cur >= tgt ? 'ผ่านเป้า' : 'ขาด ' + moneyS(tgt - cur)}`, tp >= 100 ? '--up' : tp >= 80 ? '--c4' : '--dn')
+    : kc('รายรับ (ตามวันที่ซื้อ)', money(rc), cmpHtml(cmpM(m, k => net(rcOf(k)), DBRNG)), '--c3');
+  const k3 = kc('อัตราปิด Lead', lr == null ? '-' : lr.toFixed(1) + '%', lr == null ? 'ไม่มีข้อมูล Lead เดือนนี้' : `${fmt(L.filter(r => r.bought).length)} จาก ${fmt(L.length)} ราย ` + (lpr != null ? ptH(lr, lpr) + ' จากเดือนก่อน' : ''), lr == null || lpr == null ? '--c3' : lr >= lpr ? '--up' : '--dn');
+  const k4 = kc('ยอดคงค้างวิกฤต (AR)', money(D.critV), `เกิน ${CFG.AR_CRIT_DAYS} วัน ${fmt(D.crit.length)} ราย · คงค้างรวม ${moneyS(D.tot)}`, D.critV > 0 ? '--dn' : D.warnV > 0 ? '--c4' : '--up');
+  $('ov-kpi').innerHTML = k1 + k2 + k3 + k4;
+
+  // กราฟ SO vs รายรับ (เฉพาะเดือนที่ข้อมูลครบ)
+  const allM = [...new Set([...SOBY.keys(), ...RCBY.keys()])].sort(), last12 = allM.slice(-12);
+  const pts = (of, rng) => last12.map(k => ({ label: mShort(k), v: monthDone(k, rng) ? net(of(k)) : null }));
+  lines2('ov-chart', [{ name: 'ยอดขายตามเลข SO', color: '--c1', pts: pts(soOf, SORNG) }, { name: 'รายรับ (ยอดสุทธิตามวันที่ซื้อ)', color: '--c2', pts: pts(rcOf, DBRNG) }], money, short, { r: 3.5 });
+  const part = last12.filter(k => !monthDone(k, SORNG) || !monthDone(k, DBRNG));
+  const gap = rc - cur;
+  $('ov-gap').innerHTML = `<b>${monthName(m)}:</b> รายรับ ${money(rc)} − SO ${money(cur)} = <span class="${gap >= 0 ? 'up' : 'dn'}">${sg(gap)}</span> (ส่วนต่างเกิดจากรายการที่ไม่ใช่เลข SO เช่น FO และการบันทึกต่างเดือนกัน) · "รายรับ" ในที่นี้คือยอดสุทธิตามวันที่ซื้อ ไม่ใช่วันที่เงินเข้าบัญชีจริง` +
+    (part.length ? `<br>เดือนที่ข้อมูลยังไม่ครบ (${part.map(mShort).join(', ')}) ไม่แสดงในกราฟเพื่อไม่ให้ดูเหมือนยอดตก` : '');
+
+  // Exception alerts
+  const A = [], add = (sev, t, tab) => A.push({ sev, t, tab });
+  const cm = chStats(m), cp = chStats(P);
+  if (okP) [...cp].map(([k, b]) => ({ k, v1: (cm.get(k) || { v: 0 }).v, v0: b.v })).filter(x => x.v0 > 0 && x.v0 - x.v1 >= Math.max(prv * .03, 1) && (x.v0 - x.v1) / x.v0 >= .2)
+    .sort((a, b) => (b.v0 - b.v1) - (a.v0 - a.v1)).slice(0, 2).forEach(x => { const p = (x.v1 - x.v0) / x.v0 * 100; add(p <= -40 ? 2 : 1, `ช่องทาง <b>${esc(x.k)}</b> ยอด SO ตก ${Math.abs(p).toFixed(0)}% (${money(x.v0)} → ${money(x.v1)})`, 'ch'); });
+  if (D.crit.length) add(2, `ลูกค้า ${fmt(D.crit.length)} ราย ค้างชำระเกิน ${CFG.AR_CRIT_DAYS} วัน รวม <b>${money(D.critV)}</b> · มากสุด ${esc(D.crit[0].k)} ${money(D.crit[0].v)} (${fmt(D.crit[0].age)} วัน)`, 'risk');
+  else if (D.warn.length) add(1, `ลูกค้า ${fmt(D.warn.length)} ราย ค้างชำระเกิน ${CFG.AR_WARN_DAYS} วัน รวม <b>${money(D.warnV)}</b>`, 'risk');
+  const dead = DBRNG.max ? calcDead(DBRNG.max) : [], d90 = dead.filter(x => x.idle > 90).length, d30 = dead.filter(x => x.idle > 30).length;
+  if (d90) add(1, `สินค้าไม่หมุนเวียน: <b>${fmt(d90)} รุ่น</b> ไม่มียอดเกิน 90 วัน (รวมเกิน 30 วัน ${fmt(d30)} รุ่น)`, 'risk');
+  else if (d30) add(0, `สินค้าไม่มียอดเกิน 30 วัน ${fmt(d30)} รุ่น`, 'risk');
+  if (lr != null && lpr != null && lr - lpr <= -2 && monthDone(m, LDRNG)) add(lr - lpr <= -5 ? 2 : 1, `อัตราปิด Lead ลดลง ${Math.abs(lr - lpr).toFixed(1)} จุด เหลือ ${lr.toFixed(1)}%`, 'ch');
+  if (tgt && okM && tp < 100) add(tp < 80 ? 2 : 1, `ยอดขายได้ ${tp.toFixed(0)}% ของเป้า (ขาด ${money(tgt - cur)})`, 'ov');
+  const top = [...cm].sort((a, b) => b[1].v - a[1].v)[0];
+  if (top && cur > 0 && top[1].v / cur > .5) add(1, `พึ่งช่องทาง <b>${esc(top[0])}</b> ถึง ${(top[1].v / cur * 100).toFixed(0)}% ของยอด SO`, 'ch');
+  if (!okM) add(0, `ข้อมูลของ ${monthName(m)} ยังไม่ครบเดือน ตัวเลขอาจต่ำกว่าจริง`, 'ov');
+  A.sort((a, b) => b.sev - a.sev);
+  const shown = A.slice(0, 5), lab = ['ข้อมูล', 'เตือน', 'วิกฤต'];
+  $('ov-alerts').innerHTML = shown.length ? shown.map(a => `<div class="alert s${a.sev}"><span class="badge ${a.sev === 2 ? 'lo' : a.sev === 1 ? 'md' : 'mt'}">${lab[a.sev]}</span><span class="t">${a.t}</span>${a.tab !== 'ov' ? `<a onclick="showTab('${a.tab}')">ดูรายละเอียด</a>` : ''}</div>`).join('')
+    : '<div class="alert s0"><span class="badge hi">ปกติ</span><span class="t">ไม่พบความผิดปกติที่ต้องจัดการ</span></div>';
+
+  // ประโยคสรุป
+  const thr = 5, tone = mom == null ? 'md' : mom >= thr ? 'hi' : mom <= -thr ? 'lo' : 'md', labl = tone === 'hi' ? 'ดี' : tone === 'lo' ? 'ควรระวัง' : 'ปกติ';
+  let vt = `${monthName(m)}: ยอดขาย SO ${money(cur)}` + (mom != null ? ` ${mom >= 0 ? 'เพิ่มขึ้น' : 'ลดลง'} ${Math.abs(mom).toFixed(1)}% จากเดือนก่อน` : '') + (tp != null ? ` · ได้ ${tp.toFixed(0)}% ของเป้า` : '');
+  const sev2 = A.filter(a => a.sev === 2).length;
+  vt += sev2 ? ` · มีเรื่องวิกฤต ${sev2} จุด` : A.some(a => a.sev === 1) ? ' · มีเรื่องที่ควรเฝ้าระวัง' : ' · ไม่พบจุดวิกฤต';
+  $('ov-verdict').innerHTML = `<div class="verdict ${tone}"><span class="badge ${tone}">${labl}</span><p>${vt}</p></div>`;
+}
+
+/* ===== 2) ยอดขายและสินค้า ===== */
+const dimOf = (r, d) => r[d] || '(ไม่ระบุ)';
+function fillDv(selId, dimId) {
+  const d = $(dimId).value, vals = [...group(ROWS, r => dimOf(r, d), () => ({ v: 0 }), (a, r) => a.v += r.net)].sort((a, b) => b[1].v - a[1].v).map(([k]) => k);
+  $(selId).innerHTML = `<option value="all">ทุก${DIMN[d]}</option>` + vals.map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
+}
+function renderProd() {
+  const m = MON; if (!m) return;
+  const dim = $('dim').value, dv = $('dv').value, q = norm($('q').value), P = mPrev(m);
+  $('sub').textContent = monthName(m) + ' · ตามวันที่ซื้อ';
+  const pred = r => (dv === 'all' || dimOf(r, dim) === dv) && (!q || norm(r.prod).includes(q));
+  const sc = rcOf(m).filter(pred), sp = rcOf(P).filter(pred), okPP = monthDone(P, DBRNG) && sp.length > 0;
+  const stat = rs => ({ o: nOrd(rs), q: sum(rs.map(r => r.qty)), v: net(rs) }), c = stat(sc), S = {};
+  const sOf = k => S[k] || (S[k] = stat(rcOf(k).filter(pred)));
+  const dl = f => cmpHtml(cmpM(m, k => sOf(k)[f], DBRNG));
+  $('p-kpi').innerHTML = kc('ยอดสุทธิ', money(c.v), dl('v'), '--c1') + kc('จำนวนชิ้นที่ขาย', fmt(c.q), dl('q'), '--c3') + kc('จำนวนออเดอร์', fmt(c.o), dl('o'), '--c2');
+
+  // แยกตามมุมมอง (ทุกค่าของมิตินั้น)
+  const mAll = rcOf(m).filter(r => !q || norm(r.prod).includes(q)), pAll = rcOf(P).filter(r => !q || norm(r.prod).includes(q)), tAll = net(mAll) || 1;
+  const gm = group(mAll, r => dimOf(r, dim), () => [], (a, r) => a.push(r)), gp = group(pAll, r => dimOf(r, dim), () => [], (a, r) => a.push(r));
+  const drows = [...new Set([...gm.keys(), ...gp.keys()])].map(k => ({ k, v: net(gm.get(k) || []), pv: net(gp.get(k) || []) })).sort((a, b) => b.v - a.v), mxv = drows.length ? Math.max(drows[0].v, 1) : 1;
+  $('p-dt').textContent = 'ยอดสุทธิตาม' + DIMN[dim];
+  $('p-dtab').innerHTML = tbl([DIMN[dim], 'ยอดสุทธิ (฿)', 'เทียบเดือนก่อน', 'สัดส่วน'], drows.map(x => [(x.k === dv ? '<b>' + esc(x.k) + '</b>' : esc(x.k)), fmt(x.v),
+    x.pv > 0 ? (okPP || monthDone(P, DBRNG) ? pctH(x.v, x.pv) : '-') : (x.v > 0 ? '<span class="mt">ใหม่</span>' : '-'),
+    `${(x.v / tAll * 100).toFixed(1)}%<div class="mb"><span style="width:${(x.v / mxv * 100).toFixed(1)}%"></span></div>`]));
+
+  // แนวโน้ม
+  const allM = [...RCBY.keys()].sort().slice(-12);
+  lines2('p-trend', [{ name: '', color: '--c1', pts: allM.map(k => ({ label: mShort(k), v: monthDone(k, DBRNG) ? net(rcOf(k).filter(pred)) : null })) }], money, short, { r: 3.5 });
+
+  // Hero 80/20
+  const pg = [...group(sc, r => r.prod || 'ไม่ระบุ', () => ({ v: 0, q: 0 }), (a, r) => { a.v += r.net; a.q += r.qty; })].map(([k, a]) => ({ k, ...a })).sort((a, b) => b.v - a.v), tot = sum(pg.map(x => x.v)) || 1;
+  let cum = 0, k80 = 0; pg.forEach((x, i) => { cum += x.v; x.cum = cum / tot * 100; if (!k80 && cum / tot >= .8) k80 = i + 1; });
+  $('p-hn').textContent = pg.length ? `${fmt(k80)} จาก ${fmt(pg.length)} รุ่น ทำยอดถึง 80% · 10 อันดับแรกรวม ${(sum(pg.slice(0, 10).map(x => x.v)) / tot * 100).toFixed(0)}% ของยอด` : '';
+  $('p-hero').innerHTML = tbl(['#', 'รุ่น', 'ยอดสุทธิ (฿)', 'ชิ้น', 'สัดส่วน', 'สะสม', 'กลุ่ม'], pg.slice(0, 10).map((x, i) => [i + 1, esc(x.k), fmt(x.v), fmt(x.q), (x.v / tot * 100).toFixed(1) + '%', x.cum.toFixed(0) + '%',
+    `<span class="badge ${x.cum - x.v / tot * 100 < 80 ? 'hi' : 'mt'}">${x.cum - x.v / tot * 100 < 80 ? 'A (80%)' : 'B/C'}</span>`]), 2);
+  $('p-hero').querySelectorAll('tr').forEach(tr => { const t = tr.cells; if (t.length) { t[0].className = ''; t[1].className = ''; } });
+
+  // พุ่ง/ตก
+  const mv = (up) => {
+    if (!okPP) return tbl(['รุ่น', 'เดือนนี้', 'เดือนก่อน', 'ส่วนต่าง'], [['<span class="mt">ไม่มีเดือนก่อนที่ข้อมูลครบให้เทียบ</span>', '', '', '']], 1);
+    const a = group(sc, r => r.prod || 'ไม่ระบุ', () => ({ v: 0 }), (o, r) => o.v += r.net), b = group(sp, r => r.prod || 'ไม่ระบุ', () => ({ v: 0 }), (o, r) => o.v += r.net), th = Math.max(net(sp) * .005, 1);
+    const l = [...new Set([...a.keys(), ...b.keys()])].map(k => { const v1 = a.has(k) ? a.get(k).v : 0, v0 = b.has(k) ? b.get(k).v : 0; return { k, v1, v0, d: v1 - v0 }; })
+      .filter(x => up ? x.d >= th : x.d <= -th).sort((x, y) => up ? y.d - x.d : x.d - y.d).slice(0, 5);
+    return tbl(['รุ่น', 'เดือนนี้ (฿)', 'เดือนก่อน (฿)', 'ส่วนต่าง'], l.map(x => [esc(x.k) + (x.v0 === 0 ? ' <span class="badge mt">ใหม่</span>' : ''), fmt(x.v1), fmt(x.v0), sgC(x.d)]), 1);
+  };
+  $('p-up').innerHTML = mv(true); $('p-dn').innerHTML = mv(false);
+  $('p-note').textContent = `ยอดสุทธิตามวันที่ซื้อ · พุ่ง/ตก นับเฉพาะรุ่นที่เปลี่ยนไม่น้อยกว่า 0.5% ของยอดเดือนก่อน` + (SKUM ? ` · รวมชื่อรุ่นที่สะกดต่างกันแค่ช่องว่าง/ตัวพิมพ์แล้ว ${fmt(SKUM)} รุ่น` : '');
+}
+
+/* ===== 3) ช่องทางและทีมขาย ===== */
+function renderCh() {
+  const m = MON; if (!m) return;
+  const P = mPrev(m), so = soOf(m);
+  $('sub').textContent = monthName(m);
+  // Donut + ตารางช่องทาง (ยอดตามเลข SO)
+  const cm = group(so, r => r.ch || 'ไม่ระบุ', () => [], (a, r) => a.push(r)), cp = chStats(P), okP = monthDone(P, SORNG);
+  const rows = [...cm].map(([k, rs]) => ({ k, v: net(rs), o: nOrd(rs), pv: (cp.get(k) || { v: 0 }).v })).sort((a, b) => b.v - a.v), tot = sum(rows.map(x => x.v)) || 1;
+  const items = rows.slice(0, 5).map(x => [x.k, x.v]), rest = sum(rows.slice(5).map(x => x.v)); if (rest > 0) items.push(['อื่น ๆ', rest]);
+  $('c-pt').textContent = 'สัดส่วนยอดขายตามช่องทาง (ยอด SO)';
+  pie('c-pie', items, short(tot), 'ยอด SO (บาท)', moneyS);
+  $('c-tab').innerHTML = tbl(['ช่องทาง', 'ยอด SO (฿)', 'เทียบเดือนก่อน', 'ออเดอร์', 'AOV'], rows.map(x => [esc(x.k), fmt(x.v),
+    x.pv > 0 ? (okP ? pctH(x.v, x.pv) : '-') : (x.v > 0 ? '<span class="mt">ใหม่</span>' : '-'), fmt(x.o), x.o ? '฿' + fmt(x.v / x.o) : '-']));
+
+  // Pipeline Lead
+  const L = ldOf(m), n = L.length, b = L.filter(r => r.bought).length;
+  $('c-ft').textContent = 'Pipeline การปิดการขาย · ' + monthName(m);
+  hbar('c-func', [['ลูกค้าที่เข้ามา', n], ['ติดตามครั้งที่ 1', L.filter(r => r.f1).length], ['ติดตามครั้งที่ 2', L.filter(r => r.f2).length], ['ติดตามครั้งที่ 3', L.filter(r => r.f3).length], ['ซื้อแล้ว', b]]
+    .map(([l, v]) => [l, v, n ? (v / n * 100).toFixed(0) + '%' : '']), v => fmt(v) + ' ราย');
+  const win = Array.from({ length: 6 }, (_, i) => { let k = m; for (let j = 0; j < 5 - i; j++) k = mPrev(k); return k; });
+  gbars('c-pipe', win.map(mShort), [{ name: 'Lead เข้ามา', color: '--c1', vals: win.map(k => ldOf(k).length || null) }, { name: 'ซื้อแล้ว', color: '--c2', vals: win.map(k => ldOf(k).length ? ldOf(k).filter(r => r.bought).length : null) }], fmt);
+
+  // ทีม
+  const mons = $('tw').value === '3' ? [m, P, mPrev(P)] : [m], LS = LEADS.filter(r => mons.some(k => r.date.startsWith(k)));
+  const avg = LS.length ? LS.filter(r => r.bought).length / LS.length * 100 : 0;
+  $('c-tn').textContent = `ค่าเฉลี่ยทั้งทีม ${avg.toFixed(1)}% · เขียว = สูงกว่าเฉลี่ยทีม, แดง = ต่ำกว่า · ผู้ที่มี Lead น้อยกว่า 10 ราย เป็นสีเทา (ตัวอย่างน้อยเกินไปที่จะตัดสิน) · Lead ที่ลงชื่อ 2 คน นับให้ทั้งสองคน`;
+  const trows = OFFS.map(o => { const rs = LS.filter(r => r.offs.includes(o)), k = rs.filter(r => r.bought).length; return { o, n: rs.length, k, r: rs.length ? k / rs.length * 100 : 0 }; }).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
+  $('c-team').innerHTML = tbl(['เจ้าหน้าที่', 'Lead', 'ซื้อแล้ว', 'อัตราปิด', 'เทียบเฉลี่ยทีม'], trows.map(x => { const cls = x.n < 10 ? 'mt' : x.r >= avg ? 'up' : 'dn';
+    return [esc(x.o), fmt(x.n), fmt(x.k), `<span class="${cls}"><b>${x.r.toFixed(1)}%</b></span><div class="mb"><span style="width:${Math.min(x.r, 100).toFixed(0)}%"></span></div>`, x.n < 10 ? '<span class="mt">ตัวอย่างน้อย</span>' : ptH(x.r, avg)]; }));
+  const via = [...group(LS, r => r.via || 'ไม่ระบุ', () => ({ n: 0, b: 0 }), (a, r) => { a.n++; if (r.bought) a.b++; })].map(([k, a]) => ({ k, ...a, r: a.b / a.n * 100 })).sort((a, b) => b.n - a.n);
+  $('c-via').innerHTML = tbl(['ช่องทางที่ติดต่อเข้ามา', 'Lead', 'ซื้อแล้ว', 'อัตราปิด'], via.map(x => [esc(x.k), fmt(x.n), fmt(x.b), `<span class="${x.n < 10 ? 'mt' : x.r >= avg ? 'up' : 'dn'}"><b>${x.r.toFixed(1)}%</b></span>`]));
+}
+
+/* ===== 4) ความเสี่ยง ===== */
+function renderRisk() {
+  $('sub').textContent = DBRNG.max ? 'ข้อมูลถึง ' + dateTh(DBRNG.max) : '';
+  const D = debtInfo(), dead = DBRNG.max ? calcDead(DBRNG.max).filter(x => x.idle > 30) : [];
+  $('r-kpi').innerHTML = kc('ยอดคงค้างรวม', money(D.tot), `${fmt(D.list.length)} ราย · ${fmt(D.n)} ออเดอร์`, '--c1') +
+    kc(`ค้างเกิน ${CFG.AR_CRIT_DAYS} วัน (วิกฤต)`, money(D.critV), `${fmt(D.crit.length)} ราย`, D.critV > 0 ? '--dn' : '--up') +
+    kc(`ค้าง ${CFG.AR_WARN_DAYS + 1}–${CFG.AR_CRIT_DAYS} วัน (เตือน)`, money(D.warnV), `${fmt(D.warn.length)} ราย`, D.warnV > 0 ? '--c4' : '--up') +
+    kc('สินค้าไม่มียอดเกิน 30 วัน', fmt(dead.length) + ' รุ่น', 'ไม่รวมพรีออเดอร์/ขายครั้งเดียว', dead.length ? '--c4' : '--up') +
+    kc('เงียบเกิน 90 วัน', fmt(dead.filter(x => x.idle > 90).length) + ' รุ่น', 'ควรทบทวนเร่งด่วน', dead.some(x => x.idle > 90) ? '--dn' : '--up');
+  const st = $('r-st').value, dl = D.list.filter(x => st === 'all' || x.st >= +st);
+  $('r-debt').innerHTML = tbl(['#', 'ลูกค้า', 'เลข SO', 'ซื้อครั้งแรกที่ค้าง', 'อายุหนี้ (วัน)', 'ยอดคงค้าง (฿)', 'สัดส่วน', 'สถานะ'], dl.map((x, i) => [i + 1, esc(x.k), esc(x.so), x.oldest ? dateTh(x.oldest) : '-',
+    `<span class="${x.st === 2 ? 'dn' : x.st === 1 ? 'wn' : ''}">${fmt(x.age)}</span>`, `<b>${fmt(x.v)}</b>`, (x.v / (D.tot || 1) * 100).toFixed(1) + '%', stBadge(x.st)]), 4);
+  $('r-debt').querySelectorAll('tr').forEach(tr => { const t = tr.cells; if (t.length > 3) { [0, 1, 2, 3].forEach(i => t[i].className = ''); t[7].className = ''; } });
+  const d = $('r-dim').value, dv = $('r-dv').value, dd = dead.filter(x => dv === 'all' || x[d] === dv);
+  $('r-dead').innerHTML = tbl(['#', 'รุ่น', 'กลุ่ม', 'ขายล่าสุด', 'เงียบ (วัน)', 'ชิ้นรวมในอดีต', 'ยอดรวมในอดีต (฿)', 'สถานะ'], dd.map((x, i) => [i + 1, esc(x.k), esc(x.grp), dateTh(x.last),
+    `<span class="${x.idle > 90 ? 'dn' : x.idle > 60 ? 'wn' : ''}">${fmt(x.idle)}</span>`, fmt(x.q), fmt(x.v), x.idle > 90 ? '<span class="badge lo">วิกฤต</span>' : x.idle > 60 ? '<span class="badge md">เตือน</span>' : '<span class="badge mt">เฝ้าระวัง</span>']), 4);
+  $('r-dead').querySelectorAll('tr').forEach(tr => { const t = tr.cells; if (t.length > 3) { [0, 1, 2, 3].forEach(i => t[i].className = ''); t[7].className = ''; } });
+}
+
+/* ===== ระบบหน้า/เมนู ===== */
+function closeMenu() { $('side').classList.remove('open'); $('bd').classList.remove('show'); }
+function setupMenu() {
+  $('menuBtn').addEventListener('click', () => { $('side').classList.toggle('open'); $('bd').classList.toggle('show'); });
+  $('bd').addEventListener('click', closeMenu);
+}
+function showTab(t) {
+  CUR = t; $('pgtitle').textContent = TITLES[t]; closeMenu();
+  TABS.forEach(k => $('v-' + k).hidden = k !== t);
+  $('monthWrap').style.display = t === 'risk' ? 'none' : '';
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  ({ ov: renderOv, prod: renderProd, ch: renderCh, risk: renderRisk })[t]();
+}
+let lastW = window.innerWidth;
+window.addEventListener('resize', () => { clearTimeout(window._rz); window._rz = setTimeout(() => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; showTab(CUR); }, 200); });
+function warn(t) { $('msg').style.display = 'block'; $('msg').textContent = t; }
+
+/* ===== โหลดข้อมูล (โครงสร้าง ROWS / LEADS / CHAT / TGT เดิม) ===== */
+async function init() {
+  try {
+    const res = await fetch(CFG.appsScriptUrl + '?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json(), raw = j.rows || [], C = CFG.COL;
+    if (!raw.length) warn('เชื่อมต่อได้ แต่ไม่พบแถวข้อมูล (แท็บที่อ่าน: ' + (j._sheet || 'ไม่พบ') + ' · แท็บทั้งหมด: ' + (j._sheetNames || []).join(', ') + ')');
+    else {
+      const have = Object.keys(raw[0]).map(norm), miss = Object.values(C).filter(h => !have.includes(norm(h)));
+      if (miss.length) warn('ไม่พบคอลัมน์: ' + miss.join(', ') + ' · หัวตารางที่พบ: ' + Object.keys(raw[0]).join(', '));
+      else { const missC = CATS.filter(c => !have.some(h => h.startsWith(norm(c.col)))).map(c => c.col);
+        if (missC.length) warn('ไม่พบคอลัมน์ใหม่: ' + missC.join(', ') + ' · หัวตารางที่พบ: ' + Object.keys(raw[0]).join(', ')); }
+    }
+    ROWS = raw.map((r, i) => {
+      const n = {}; for (const k in r) n[norm(k)] = r[k];
+      const g = k => n[norm(C[k])],
+        gf = name => { const q = norm(name); if (q in n) return n[q]; const f = Object.keys(n).find(x => x.startsWith(q)); return f === undefined ? '' : n[f]; },
+        order = String(g('order') ?? '').trim() || ('(ว่าง)' + i), ou = order.toUpperCase();
+      return { date: parseDate(g('date')), order, prod: String(g('prod') ?? '').trim(), qty: num(g('qty')), pre: marked(g('pre')),
+        cust: String(g('cust') ?? '').trim(), cancel: marked(g('cancel')), ch: String(g('ch') ?? '').trim(),
+        prov: provN(String(g('prov') ?? '').trim()), ship: String(g('ship') ?? '').replace(/\s+/g, ' ').trim(), ctype: String(g('ctype') ?? '').trim(), cat: String(gf(CATS[0].col) ?? '').trim(), typ: String(gf(CATS[1].col) ?? '').trim(), grp: String(gf(CATS[2].col) ?? '').trim(), pay: String(g('pay') ?? '').trim(), price: num(g('price')), net: num(g('net')), ar: num(g('ar')),
+        b2b: norm(g('ch')) === norm(CFG.B2B_CHANNEL), fo: ou.startsWith('FO'), so: !ou.startsWith('FO'), sod: (m => m && +m[2] >= 1 && +m[2] <= 12 && +m[3] >= 1 && +m[3] <= 31 ? '20' + m[1] + '-' + m[2] + '-' + m[3] : '')(/^S(\d{2})(\d{2})(\d{2})\d+$/.exec(ou)) };
+    }).filter(r => !(CFG.EXCLUDE_CANCELLED && r.cancel));
+    // รวมชื่อรุ่นที่สะกดต่างกันเฉพาะช่องว่าง/ตัวพิมพ์ (เช่น M5Pro / M5 Pro) ใช้ชื่อที่พบบ่อยที่สุดเป็นชื่อกลาง
+    const cnt = new Map();
+    ROWS.forEach(r => { if (!r.prod) return; const k = skuKey(r.prod); if (!cnt.has(k)) cnt.set(k, new Map()); const mm = cnt.get(k); mm.set(r.prod, (mm.get(r.prod) || 0) + 1); });
+    const canon = new Map([...cnt].map(([k, mm]) => [k, [...mm].sort((a, b) => b[1] - a[1])[0][0]]));
+    ROWS.forEach(r => { if (r.prod) r.prod = canon.get(skuKey(r.prod)); });
+    SKUM = [...cnt.values()].filter(mm => mm.size > 1).length;
+    LEADS = (j.leads || []).map(r => {
+      const n = {}; for (const k in r) n[norm(k)] = r[k];
+      const f = name => { const q = norm(name); if (q in n) return n[q]; const k = Object.keys(n).find(x => x.startsWith(q)); return k === undefined ? '' : n[k]; };
+      const t = x => String(x ?? '').trim();
+      return { date: leadDate(f('วันที่'), f('วันที่ (เลขวัน)')), via: t(f('ช่องทางที่ลูกค้าติดต่อมา')), offs: splitOff(f('เจ้าหน้าที่')),
+        bought: norm(f('ซื้อแล้ว')).startsWith('ซื้อแล้ว'), buy: t(f('ช่องทาง (ที่สั่งซื้อ)')),
+        f1: marked(f('ติดตามครั้งที่ 1')), f2: marked(f('ติดตามครั้งที่ 2')), f3: marked(f('ติดตามครั้งที่ 3')), score: starOf(f('คะแนน')) };
+    });
+    SORNG = rangeOf(ROWS.map(r => r.sod)); DBRNG = rangeOf(ROWS.map(r => r.date)); LDRNG = rangeOf(LEADS.map(r => r.date));
+    CHAT = Object.assign({ shopee: [], fb: [] }, j.chat || {});   // โหลดไว้ตามโครงสร้างเดิม (ยังไม่แสดงในหน้าใหม่)
+    TGT = (j.targets || []).map(r => { const n = {}; for (const k in r) n[norm(k)] = r[k]; const g = nm => { const q = norm(nm), k = Object.keys(n).find(x => x.startsWith(q)); return k === undefined ? '' : n[k]; };
+      return { m: tgtMonth(g('เดือน')), ch: norm(g('ช่องทาง')), v: num(g('เป้า')) }; }).filter(t => t.m && t.v > 0);
+    if (!LEADS.length && $('msg').style.display !== 'block') warn('ไม่พบแถวข้อมูลในแท็บ Lead (แท็บที่อ่าน: ' + (j._leadSheet || 'ไม่พบ') + ' · แท็บทั้งหมด: ' + (j._sheetNames || []).join(', ') + ')');
+  } catch (e) { warn('โหลดข้อมูลไม่สำเร็จ (' + e.message + ')'); $('sub').textContent = 'ไม่มีข้อมูล'; }
+  buildIdx();
+  const months = [...new Set([...SOBY.keys(), ...RCBY.keys()])].sort().reverse();
+  $('month').innerHTML = months.map(k => `<option value="${k}">${monthName(k)}${monthDone(k, SORNG) && monthDone(k, DBRNG) ? '' : ' (ยังไม่ครบ)'}</option>`).join('');
+  MON = months.find(k => monthDone(k, SORNG) && monthDone(k, DBRNG)) || months[0] || ''; $('month').value = MON;
+  $('month').addEventListener('change', () => { MON = $('month').value; showTab(CUR); });
+  const oc = new Map(); LEADS.forEach(r => r.offs.forEach(o => oc.set(o, (oc.get(o) || 0) + 1)));
+  OFFS = [...oc.keys()].filter(o => o !== 'ทั้งทีมฝ่ายขาย').sort((a, b) => ((a === 'ไม่ทราบ') - (b === 'ไม่ทราบ')) || oc.get(b) - oc.get(a));
+  fillDv('dv', 'dim'); fillDv('r-dv', 'r-dim');
+  $('dim').addEventListener('change', () => { fillDv('dv', 'dim'); renderProd(); }); $('dv').addEventListener('change', renderProd); $('q').addEventListener('input', renderProd);
+  $('tw').addEventListener('change', renderCh);
+  $('r-st').addEventListener('change', renderRisk); $('r-dim').addEventListener('change', () => { fillDv('r-dv', 'r-dim'); renderRisk(); }); $('r-dv').addEventListener('change', renderRisk);
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.t)));
+  showTab('ov');
+}
+
+/* ===== ล็อกหน้าเว็บด้วยรหัส 4 หลัก ===== */
+const LS_KEY = 'dash_unlocked';
+const getOK = () => { try { return localStorage.getItem(LS_KEY) === CFG.PIN || sessionStorage.getItem(LS_KEY) === CFG.PIN; } catch (e) { return false; } };
+const setOK = remember => { try { (remember ? localStorage : sessionStorage).setItem(LS_KEY, CFG.PIN); } catch (e) {} };
+const clearOK = () => { try { localStorage.removeItem(LS_KEY); sessionStorage.removeItem(LS_KEY); } catch (e) {} };
+let started = false;
+function unlock() {
+  document.body.classList.remove('locked'); $('lock').hidden = true; $('logout').hidden = false;
+  if (!started) { started = true; init(); }
+}
+function showLock() {
+  document.body.classList.add('locked'); $('lock').hidden = false; $('logout').hidden = true; $('lockmsg').textContent = '';
+  const ins = [...document.querySelectorAll('#pin input')]; ins.forEach(i => i.value = ''); ins[0].focus();
+}
+function setupLock() {
+  const ins = [...document.querySelectorAll('#pin input')];
+  const check = () => {
+    const v = ins.map(i => i.value).join(''); if (v.length < ins.length) return;
+    if (v === CFG.PIN) { setOK($('rem').checked); unlock(); return; }
+    $('lockmsg').textContent = 'รหัสไม่ถูกต้อง'; $('pin').classList.remove('shake'); void $('pin').offsetWidth; $('pin').classList.add('shake');
+    ins.forEach(i => i.value = ''); ins[0].focus();
+  };
+  ins.forEach((inp, i) => {
+    inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(-1); if (inp.value && i < ins.length - 1) ins[i + 1].focus(); check(); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && !inp.value && i > 0) ins[i - 1].focus(); });
+    inp.addEventListener('paste', e => {
+      const t = ((e.clipboardData && e.clipboardData.getData('text')) || '').replace(/\D/g, '').slice(0, ins.length); if (!t) return;
+      e.preventDefault(); t.split('').forEach((c, k) => ins[k].value = c); ins[Math.min(t.length, ins.length) - 1].focus(); check();
+    });
+  });
+  $('logout').addEventListener('click', () => { clearOK(); showLock(); });
+  getOK() ? unlock() : showLock();
+}
+setupMenu();
+setupLock();
+</script>
+</body>
+</html>
